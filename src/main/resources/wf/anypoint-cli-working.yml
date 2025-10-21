@@ -1,0 +1,60 @@
+name: Dev - Build and Deploy
+
+#on:
+#  push:
+#    branches: feature/cli-wf-test 
+
+jobs:
+  buildPublishAndDeploy:
+    # Use this YAML in your workflow file for each job
+    runs-on: self-hosted
+    environment: DEV
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - name: Checkout repository
+    #     uses: actions/checkout@v2
+    #   - name: Publish to Exchange
+    #     run: mvn -B -U -DskipASTValidation -DskipTests deploy -s .maven/settings.xml -DappName=hello-cli-app
+    #     env:          
+    #       CONNECTED_APP_ID: ${{ secrets.CONNECTED_APP_ID }}
+    #       CONNECTED_APP_SECRET: ${{ secrets.CONNECTED_APP_SECRET }}
+    #   - name: Deploy to Runtime Manager
+    #     run: mvn -B -U -DskipASTValidation -DskipTests deploy -s .maven/settings.xml -DmuleDeploy -DappName=hello-cli-app
+    #     #        run: anypoint-cli-v4 runtime-mgr:application:deploy hello-cli-app cloudhub-us-east-2 4.9.0 hello-cli-app --assetVersion 1.0.0 --groupId 9d4e58fd-82a8-4f2c-b29b-7f6b41ec392f --replicaSize 0.1
+    #     env:
+    #       DEPLOYMENT_TARGET: ${{ vars.DEPLOYMENT_TARGET }}
+    #       TARGET_ENV: ${{ vars.TARGET_ENV }}
+    #       #          SLACK_BOT_OAUTH_TOKEN: ${{ vars.SLACK_BOT_OAUTH_TOKEN }}
+    #       #          SANDBOX_CLIENT_ID: ${{ secrets.SANDBOX_CLIENT_ID }}
+    #       #          SANDBOX_CLIENT_SECRET: ${{ secrets.SANDBOX_CLIENT_SECRET }}
+    #       BUS_GROUP_ID: ${{ vars.BUS_GROUP_ID }}
+    #       CONNECTED_APP_ID: ${{ secrets.CONNECTED_APP_ID }}
+    #       CONNECTED_APP_SECRET: ${{ secrets.CONNECTED_APP_SECRET }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js (needed for Anypoint CLI)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Anypoint CLI
+        run: npm install -g anypoint-cli-v4
+
+      - name: Add Anypoint Account Plugin
+        run: anypoint-cli-v4 plugins:install anypoint-cli-account-plugin
+
+      - name: Add Runtime Plugin CLI
+        run: anypoint-cli-v4 plugins:install anypoint-cli-runtime-mgr-plugin
+
+      - name: Authenticate with Anypoint Platform
+        run: |
+          anypoint-cli-v4 conf client_id ${{ secrets.CONNECTED_APP_ID }}
+          anypoint-cli-v4 conf client_secret ${{ secrets.CONNECTED_APP_SECRET }}
+          anypoint-cli-v4 conf organization ${{ vars.BUS_GROUP_ID }}
+          anypoint-cli-v4 conf environment ${{ vars.TARGET_ENV }}
+
+      - name: Deploy to CloudHub
+        run: anypoint-cli-v4 runtime-mgr:application:deploy ${{ vars.APP_NAME }} ${{ vars.DEPLOYMENT_TARGET }} ${{ vars.RUNTIME_VERSION }} ${{ vars.APP_NAME }} --assetVersion ${{ vars.ASSET_VERSION }} --groupId ${{ vars.BUS_GROUP_ID }} --replicaSize ${{ vars.REPLICA_SIZE }}

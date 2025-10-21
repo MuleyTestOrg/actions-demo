@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>9d4e58fd-82a8-4f2c-b29b-7f6b41ec392f</groupId>
+	<artifactId>hello-cli-app</artifactId>
+	<version>1.1.12-SNAPSHOT</version>
+	<packaging>mule-application</packaging>
+
+	<name>hello-cli-app</name>
+
+
+<scm>
+		<url>https://github.com/narendar-gaddam_sfemu/hello-cli-app.git</url>
+		<connection>scm:git:ssh://git@github.com/narendar-gaddam_sfemu/hello-cli-app.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/narendar-gaddam_sfemu/hello-cli-app.git</developerConnection>
+	  <tag>HEAD</tag>
+  </scm>
+
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<app.runtime>4.9.8</app.runtime>
+<!-- 		<release.tag>1.0.224</release.tag> -->
+		
+ 		<mule.maven.plugin.version>4.3.0</mule.maven.plugin.version>
+		<deploy.ch2.ps.url>https://anypoint.mulesoft.com</deploy.ch2.ps.url>
+		<deploy.ch2.ps.appName>${appName}</deploy.ch2.ps.appName>
+		<deploy.ch2.ps.target>${DEPLOYMENT_TARGET}</deploy.ch2.ps.target>
+		<deploy.ch2.ps.provider>MC</deploy.ch2.ps.provider>
+		<deploy.ch2.ps.releaseChannel>EDGE</deploy.ch2.ps.releaseChannel>
+		<deploy.ch2.ps.javaVersion>17</deploy.ch2.ps.javaVersion>
+		<deploy.ch2.ps.env>${TARGET_ENV}</deploy.ch2.ps.env>
+		<deploy.ch2.ps.replicas>1</deploy.ch2.ps.replicas>
+		<deploy.ch2.ps.vCores>0.1</deploy.ch2.ps.vCores>
+		<deploy.ch2.ps.businessGroup>\Root Org\Sub Org</deploy.ch2.ps.businessGroup>
+		<deploy.ch2.ps.businessGroupId>${project.groupId}</deploy.ch2.ps.businessGroupId>
+		<deploy.ch2.ps.cappClientId>${CONNECTED_APP_ID}</deploy.ch2.ps.cappClientId>
+		<deploy.ch2.ps.cappClientSecret>${CONNECTED_APP_SECRET}</deploy.ch2.ps.cappClientSecret>
+		<deploy.ch2.ps.cappGrantType>client_credentials</deploy.ch2.ps.cappGrantType>
+		<deploy.ch2.ps.timeoutMillis>1800000</deploy.ch2.ps.timeoutMillis>
+		<deploy.ch2.ps.skip>false</deploy.ch2.ps.skip>
+		<deploy.ch2.ps.skipDeploymentVerification>false</deploy.ch2.ps.skipDeploymentVerification>
+		<deploy.ch2.ps.enforceDeployingReplicasAcrossNodes>false</deploy.ch2.ps.enforceDeployingReplicasAcrossNodes>
+		<deploy.ch2.ps.updateStrategy>rolling</deploy.ch2.ps.updateStrategy>
+		<deploy.ch2.ps.clustered>false</deploy.ch2.ps.clustered>
+		<deploy.ch2.ps.forwardSslSession>false</deploy.ch2.ps.forwardSslSession>
+		<deploy.ch2.ps.lastMileSecurity>false</deploy.ch2.ps.lastMileSecurity>
+		<deploy.ch2.ps.generateDefaultPublicUrl>true</deploy.ch2.ps.generateDefaultPublicUrl>
+		<deploy.ch2.ps.enableObjectStoreV2>false</deploy.ch2.ps.enableObjectStoreV2>
+		<deploy.ch2.ps.pathRewrite>/</deploy.ch2.ps.pathRewrite>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.2.0</version>
+			</plugin>
+			<plugin>
+				<groupId>org.mule.tools.maven</groupId>
+				<artifactId>mule-maven-plugin</artifactId>
+				<version>${mule.maven.plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<classifier>mule-application</classifier>
+					<cloudhub2Deployment>
+						<uri>${deploy.ch2.ps.url}</uri>
+						<!-- <muleVersion>${deploy.ch2.ps.version}</muleVersion> -->
+						<releaseChannel>${deploy.ch2.ps.releaseChannel}</releaseChannel>
+						<javaVersion>${deploy.ch2.ps.javaVersion}</javaVersion>
+						<applicationName>${deploy.ch2.ps.appName}</applicationName>
+						<target>${deploy.ch2.ps.target}</target>
+						<provider>${deploy.ch2.ps.provider}</provider>
+						<environment>${deploy.ch2.ps.env}</environment>
+						<replicas>${deploy.ch2.ps.replicas}</replicas>
+						<vCores>${deploy.ch2.ps.vCores}</vCores>
+						<businessGroup>${deploy.ch2.ps.businessGroup}</businessGroup>
+						<businessGroupId>${deploy.ch2.ps.businessGroupId}</businessGroupId>
+						<connectedAppClientId>${deploy.ch2.ps.cappClientId}</connectedAppClientId>
+						<connectedAppClientSecret>${deploy.ch2.ps.cappClientSecret}</connectedAppClientSecret>
+						<connectedAppGrantType>${deploy.ch2.ps.cappGrantType}</connectedAppGrantType>
+						<deploymentTimeout>${deploy.ch2.ps.timeoutMillis}</deploymentTimeout>
+						<skip>${deploy.ch2.ps.skip}</skip>
+						<skipDeploymentVerification>${deploy.ch2.ps.skipDeploymentVerification}</skipDeploymentVerification>
+						<deploymentSettings>
+							<enforceDeployingReplicasAcrossNodes>${deploy.ch2.ps.enforceDeployingReplicasAcrossNodes}</enforceDeployingReplicasAcrossNodes>
+							<updateStrategy>${deploy.ch2.ps.updateStrategy}</updateStrategy>
+							<clustered>${deploy.ch2.ps.clustered}</clustered>
+							<http>
+								<inbound>
+									<forwardSslSession>${deploy.ch2.ps.forwardSslSession}</forwardSslSession>
+									<lastMileSecurity>${deploy.ch2.ps.lastMileSecurity}</lastMileSecurity>
+								</inbound>
+							</http>
+							<generateDefaultPublicUrl>${deploy.ch2.ps.generateDefaultPublicUrl}</generateDefaultPublicUrl>
+						</deploymentSettings>
+						<integrations>
+							<services>
+								<objectStoreV2>
+									<enabled>${deploy.ch2.ps.enableObjectStoreV2}</enabled>
+								</objectStoreV2>
+							</services>
+						</integrations>
+						<properties>
+							<anypoint.platform.client_id>${SANDBOX_CLIENT_ID}</anypoint.platform.client_id>
+							<anypoint.platform.client_secret>${SANDBOX_CLIENT_SECRET}</anypoint.platform.client_secret>
+							<channel.slack.botUserOAuthToken>${SLACK_BOT_OAUTH_TOKEN}</channel.slack.botUserOAuthToken>
+						</properties>
+					</cloudhub2Deployment>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<tagNameFormat>@{project.version}</tagNameFormat>
+			        <scmCommentPrefix>[skip ci] </scmCommentPrefix>
+					<checkModificationExcludes>
+						<checkModificationExclude>pom.xml</checkModificationExclude>
+						<checkModificationExclude>src/main/resources/jks/*.jks</checkModificationExclude>
+					</checkModificationExcludes>
+				</configuration>
+			</plugin>
+			
+
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-http-connector</artifactId>
+			<version>1.10.4</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.maven.plugins</groupId>
+		    <artifactId>maven-release-plugin</artifactId>
+		    <version>3.1.1</version>
+
+		</dependency>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-sockets-connector</artifactId>
+			<version>1.2.6</version>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>Exchange2</id>
+			<name>Exchange2</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v2/organizations/9d4e58fd-82a8-4f2c-b29b-7f6b41ec392f/maven</url>
+			<layout>default</layout>
+		</repository>
+<!-- 		<repository>
+			<id>anypoint-exchange-v2</id>
+			<name>Anypoint Exchange</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v2/maven</url>
+			<layout>default</layout>
+		</repository> -->
+		<repository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases Repository</name>
+			<url>https://repository.mulesoft.org/releases/</url>
+			<layout>default</layout>
+		</repository>
+
+		<repository>
+			<id>anypoint-exchange-v3</id>
+			<name>Anypoint Exchange</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>anypoint-exchange-v3</id>
+			<name>Mule Repo</name>
+			<url>https://maven.anypoint.mulesoft.com/api/v3/organizations/9d4e58fd-82a8-4f2c-b29b-7f6b41ec392f/maven</url>
+			<layout>default</layout>
+		</repository>
+	</distributionManagement>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases Repository</name>
+			<layout>default</layout>
+			<url>https://repository.mulesoft.org/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+
+</project>
