@@ -14,4 +14,4 @@ jobs:
       id-token: write
       contents: read
     secrets: 
-      GH_SHARED_REPO_PAT: "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"
+      GH_SHARED_REPO_PAT: "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"
