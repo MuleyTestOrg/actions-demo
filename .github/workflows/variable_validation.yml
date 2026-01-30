@@ -1,0 +1,108 @@
+name: Variable Validation
+
+on:
+  workflow_dispatch:
+jobs:
+  validate-variables:
+    name: Validate Self Hosted Mulesoft Runner
+    runs-on: [self-hosted, mulesoft]
+    container:
+      image: 658128351367.dkr.ecr.us-east-1.amazonaws.com/mulesoft-builder:latest
+    environment: DEV
+      #${{ endsWith(github.event.pull_request.base.ref, '/dev') && 'DEV' || endsWith(github.event.pull_request.base.ref, '/it') && 'IT' || endsWith(github.event.pull_request.base.ref, 'uat') && 'UAT' || endsWith(github.event.pull_request.base.ref, 'main') && 'PROD' || 'unknown' }}
+    env: 
+      ENV_NAME: DEV
+      #${{ endsWith(github.event.pull_request.base.ref, '/dev') && 'DEV' || endsWith(github.event.pull_request.base.ref, '/it') && 'IT' || endsWith(github.event.pull_request.base.ref, 'uat') && 'UAT' || endsWith(github.event.pull_request.base.ref, 'main') && 'PROD' || 'unknown' }}
+    
+    #if: | 
+    #  github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/') && (endsWith(github.event.pull_request.base.ref, '/dev') || endsWith(github.event.pull_request.base.ref, '/it'))
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Verify AWS CLI installation
+        run: |
+          if ! command -v aws &> /dev/null
+          then
+            echo "AWS CLI not found"
+          else
+            echo "AWS CLI is available"
+          fi
+          aws --version
+      - name: Extract Repository Name
+        id: repo
+        run: |
+          repo_name=${GITHUB_REPOSITORY##*/}
+          echo "repo_name=$repo_name" >> $GITHUB_OUTPUT 
+          echo "SPLUNK_SOURCE=$repo_name" >> $GITHUB_OUTPUT 
+      - name: Evaluate mapped Variables
+        id: mapper
+        env:
+          REPLICA_COUNT_MAP: ${{ vars.REPLICA_COUNT_MAP }}
+          REPLICA_SIZE_MAP: ${{ vars.REPLICA_SIZE_MAP }}
+          DEPLOYMENT_TARGET_MAP: ${{ vars.DEPLOYMENT_TARGET_MAP }}
+          AWS_ROLE_ARN_MAP: ${{ vars.AWS_ROLE_ARN_MAP }}
+          SPLUNK_INDEX_MAP: ${{ vars.SPLUNK_INDEX_MAP }}
+          CLUSTER_MODE_MAP: ${{ vars.CLUSTER_MODE_MAP }}
+          SPLUNK_TOKEN_MAP: ${{ vars.SPLUNK_TOKEN_MAP }}
+          ANYPOINT_ENV_MAP: ${{ vars.ANYPOINT_ENV_MAP }}
+        run: |
+          REPLICA_COUNT=$(echo "$REPLICA_COUNT_MAP" | jq -r 'to_entries | map(select(.key | endswith("'"$ENV_NAME"'"))) | .[].value')
+          REPLICA_SIZE=$(echo "$REPLICA_SIZE_MAP" | jq -r 'to_entries | map(select(.key | endswith("'"$ENV_NAME"'"))) | .[].value')
+          DEPLOYMENT_TARGET=$(echo "$DEPLOYMENT_TARGET_MAP" | jq -r 'to_entries | map(select(.key | endswith("'"$ENV_NAME"'"))) | .[].value')
+          AWS_ROLE_ARN=$(echo "$AWS_ROLE_ARN_MAP" | jq -r 'to_entries | map(select(.key | endswith("'"$ENV_NAME"'"))) | .[].value')
+          SPLUNK_INDEX=$(echo "$SPLUNK_INDEX_MAP" | jq -r 'to_entries | map(select(.key | endswith("'"$ENV_NAME"'"))) | .[].value')
+          CLUSTER_MODE=$(echo "$CLUSTER_MODE_MAP" | jq -r 'to_entries | map(select(.key | endswith("'"$ENV_NAME"'"))) | .[].value')
+          SPLUNK_TOKEN=$(echo "$SPLUNK_TOKEN_MAP" | jq -r 'to_entries | map(select(.key | endswith("'"$ENV_NAME"'"))) | .[].value')
+          ANYPOINT_ENV=$(echo "$ANYPOINT_ENV_MAP" | jq -r 'to_entries | map(select(.key | endswith("'"$ENV_NAME"'"))) | .[].value')
+          echo "REPLICA_COUNT=$REPLICA_COUNT" >> $GITHUB_OUTPUT 
+          echo "REPLICA_SIZE=$REPLICA_SIZE" >> $GITHUB_OUTPUT 
+          echo "DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET" >> $GITHUB_OUTPUT 
+          echo "AWS_ROLE_ARN=$AWS_ROLE_ARN" >> $GITHUB_OUTPUT 
+          echo "SPLUNK_INDEX=$SPLUNK_INDEX" >> $GITHUB_OUTPUT 
+          echo "CLUSTER_MODE=$CLUSTER_MODE" >> $GITHUB_OUTPUT 
+          echo "SPLUNK_TOKEN=$SPLUNK_TOKEN" >> $GITHUB_OUTPUT 
+          echo "ANYPOINT_ENV=$ANYPOINT_ENV" >> $GITHUB_OUTPUT 
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ steps.mapper.outputs.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Fetch secret from AWS Secrets Manager
+        id: awssecret
+        run: |
+          AWS_SPLUNK_SECRET=$(aws secretsmanager get-secret-value --secret-id splunk/mesip/tokens --query SecretString --output text)
+          echo "AWS_SPLUNK_SECRET=$AWS_SPLUNK_SECRET" >> $GITHUB_OUTPUT    
+      
+      - name: Print Docker Variables
+        run: |
+          echo "Runner Name: $RUNNER_NAME"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner Arch: $RUNNER_ARCH"
+      
+      - name: Print repo Variables
+        run: |
+          echo "repo_name: ${{ steps.repo.outputs.repo_name }}"
+          echo "SPLUNK_SOURCE: ${{ steps.repo.outputs.SPLUNK_SOURCE }}"
+          
+      - name: Print Org Simple Variables
+        run: |
+          echo "AWS_REGION: ${{ vars.AWS_REGION }}"
+          echo "SPLUNK_URL: ${{ vars.SPLUNK_URL }}"
+          
+      - name: Print Org Mapper Variables
+        run: |
+          echo "REPLICA_COUNT: ${{ steps.mapper.outputs.REPLICA_COUNT }}"
+          echo "REPLICA_SIZE: ${{ steps.mapper.outputs.REPLICA_SIZE }}"
+          echo "DEPLOYMENT_TARGET: ${{ steps.mapper.outputs.DEPLOYMENT_TARGET }}"
+          echo "AWS_ROLE_ARN: ${{ steps.mapper.outputs.AWS_ROLE_ARN }}"
+          echo "SPLUNK_INDEX: ${{ steps.mapper.outputs.SPLUNK_INDEX }}"
+          echo "CLUSTER_MODE: ${{ steps.mapper.outputs.CLUSTER_MODE }}"
+          echo "SPLUNK_TOKEN: ${{ steps.mapper.outputs.SPLUNK_TOKEN }}"
+          echo "ANYPOINT_ENV: ${{ steps.mapper.outputs.ANYPOINT_ENV }}"
+          
+      - name: Print aws secrets Variables
+        run: |
+          echo "AWS_SPLUNK_SECRET: ${{ steps.awssecret.outputs.AWS_SPLUNK_SECRET }}"
+          

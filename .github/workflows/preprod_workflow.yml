@@ -1,0 +1,14 @@
+name: PREPROD Deployment Workflow
+
+on:
+  pull_request:
+    branches: 
+      - release/r*/preprod    
+    types: [closed]      
+jobs:
+  Pre-ProdBuildPublishAndDeploy:
+    uses: narendar-gaddam_sfemu/shared-runner-templates/.github/workflows/preprod_workflow_template.yml@main
+    permissions:
+      contents: write
+      pull-requests: read    
+    secrets: inherit

@@ -1,0 +1,16 @@
+name: DEV/IT Build and Deployment Workflow
+
+on:
+ pull_request:
+   branches: 
+     - release/r*/dev   
+     - release/r*/it   
+   types: [closed]
+jobs:
+  DevITBuildPublishAndDeploy:
+    uses: narendar-gaddam_sfemu/shared-runner-templates/.github/workflows/dev_it_workflow_template.yml@main
+    permissions:
+      id-token: write
+      contents: read
+    secrets: inherit
+    

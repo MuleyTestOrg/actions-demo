@@ -1,0 +1,17 @@
+name: STAGE Deployment Workflow
+
+on: 
+  pull_request:
+    branches: 
+      - release/r*/stage    
+    types: [closed]
+  
+permissions:
+  contents: write
+  pull-requests: read
+ 
+
+jobs:
+  StagePublishAndDeploy:
+    uses: narendar-gaddam_sfemu/shared-runner-templates/.github/workflows/stage_workflow_template.yml@main
+    secrets: inherit
