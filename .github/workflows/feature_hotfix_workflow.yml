@@ -7,12 +7,12 @@ on:
       - feature/r*/* 
       - hotfix/r*/* 
 
+
 jobs:
   FeatureHotfixBuildPackage:
     # Use this YAML in your workflow file for each job
-    uses: MuleyTestOrg/shared-runner-templates/.github/workflows/feature_hotfix_workflow_template.yml@main
+    uses: narendar-gaddam_sfemu/shared-runner-templates/.github/workflows/feature_hotfix_workflow_template.yml@main
     permissions:
       id-token: write
       contents: read
-    secrets: 
-      GH_SHARED_REPO_PAT: "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"
+    secrets: inherit

@@ -1,0 +1,25 @@
+name: PROD Deployment Workflow
+
+on: 
+  pull_request:
+    branches: 
+      - release/r*/stage    
+    types: [closed]
+  
+permissions:
+  contents: write
+  pull-requests: read
+ 
+
+jobs:
+  StageDeploy:
+    uses: narendar-gaddam_sfemu/shared-runner-templates/.github/workflows/prod_workflow_template.yml@main
+    with:
+      environment: stage
+    secrets: inherit
+
+  ProdDeploy:
+    uses: narendar-gaddam_sfemu/shared-runner-templates/.github/workflows/prod_workflow_template.yml@main
+    with:
+      environment: prod
+    secrets: inherit    
