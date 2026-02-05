@@ -8,6 +8,8 @@ on:
       - hotfix/r*/* 
 jobs:
   FeatureHotfixBuildPackage:
+    runs-on: self-hosted
+
     # Use this YAML in your workflow file for each job
     steps:
       - uses: trstringer/manual-approval@v1
