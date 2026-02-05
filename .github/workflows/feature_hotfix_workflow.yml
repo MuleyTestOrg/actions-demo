@@ -10,9 +10,18 @@ on:
 jobs:
   FeatureHotfixBuildPackage:
     # Use this YAML in your workflow file for each job
-    uses: MuleyTestOrg/shared-runner-templates/.github/workflows/feature_hotfix_workflow_template.yml@main
-    permissions:
-      id-token: write
-      contents: read
-    secrets: 
-      GH_SHARED_REPO_PAT: "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"
+    steps:
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: narendar-appdev
+          minimum-approvals: 1
+          issue-title: "Deploying v1.3.5 to prod from staging"
+          issue-body: "Please approve or deny the deployment of version v1.3.5."
+          exclude-workflow-initiator-as-approver: false    
+    # uses: MuleyTestOrg/shared-runner-templates/.github/workflows/feature_hotfix_workflow_template.yml@main
+    # permissions:
+    #   id-token: write
+    #   contents: read
+    # secrets: 
+    #   GH_SHARED_REPO_PAT: "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"
