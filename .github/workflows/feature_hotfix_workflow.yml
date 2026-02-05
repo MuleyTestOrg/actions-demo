@@ -6,7 +6,6 @@ on:
     branches: 
       - feature/r*/* 
       - hotfix/r*/* 
-
 jobs:
   FeatureHotfixBuildPackage:
     # Use this YAML in your workflow file for each job
